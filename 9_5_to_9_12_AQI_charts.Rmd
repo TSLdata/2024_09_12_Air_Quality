@@ -11,14 +11,77 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
+library(scales)
+library(plotly)
 ```
 
 ```{r}
 AQI_data <- read_csv("us-epa-pm25-aqi-jacobs4-jacobs5-clean.csv")
 ```
+
 ```{r}
-AQI_data |> ggplot(aes(x=DateTime, y=sensor_4_average)) +
+first = as.POSIXct("2024-09-05 00:00:10")
+last = as.POSIXct("2024-09-12 24:00:00")
+p <- AQI_data |> ggplot(aes(x=DateTime, y=sensor_4_average)) + 
+  annotate("rect", fill="red",ymin=150, ymax=200, 
+                               alpha = 0.3, xmin= first, xmax= last, label = "unhealthy") + 
+  annotate("rect", fill="orange",ymin=100, ymax=150, 
+                               alpha = 0.3, xmin= first, xmax= last) +
+  annotate("rect", fill="purple",ymin=200, ymax=250, 
+                               alpha = 0.3, xmin= first, xmax= last) +
+  annotate("rect", fill="lightgreen",ymin=0, ymax=100, 
+                               alpha = 0.3, xmin= first, xmax= last, 
+           name ="Healthy") +
   geom_line() +
-  geom_point()
+  geom_point() +
+  scale_x_datetime(labels = date_format('%m-%d'), breaks = date_breaks("1 day")) +
+  ylab("PM2.5 AQI") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+p
 ```
+
+```{r}
+ggplotly(p)
+```
+
+```{r}
+Date <- AQI_data$DateTime
+Jacobs5A <- AQI_data$`HMC Jacobs 5 A`
+wColors <- data_frame(Date, Jacobs5A)
+
+good <- wColors |>
+  filter(Jacobs5A < 51) |>
+  mutate(quality = "good")
+
+moderate <- wColors |>
+  filter((Jacobs5A < 101) & (Jacobs5A >51)) |>
+  mutate(quality = "moderate")
+
+unhealthy_for_sen <- wColors |>
+  filter((Jacobs5A < 151) & (Jacobs5A > 101)) |>
+  mutate(quality = "Unhealthy for Sensitive Groups")
+
+unhealthy <- wColors |>
+  filter((Jacobs5A < 201) & (Jacobs5A > 151)) |>
+  mutate(quality = "Unhealthy")
+
+very_unhealthy <- wColors |>
+  filter((Jacobs5A < 251) & (Jacobs5A > 201)) |>
+  mutate(quality = "Very unhealthy")
+
+all <- rbind(good, moderate)
+all <- rbind(all, unhealthy_for_sen)
+all <- rbind(all, unhealthy)
+all <- rbind(all, very_unhealthy)
+
+```
+```{r}
+p2 <- all|> ggplot() + 
+  geom_line(aes(x=Date, y=Jacobs5A)) +
+  geom_point(aes(x=Date, y=Jacobs5A, color = quality)) 
+
+p2
+```
+
 
