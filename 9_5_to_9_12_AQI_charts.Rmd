@@ -1,0 +1,24 @@
+---
+title: "9_5_9_12_AQI_charts"
+author: "Brecken Enright"
+date: "2024-09-13"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+AQI_data <- read_csv("us-epa-pm25-aqi-jacobs4-jacobs5-clean.csv")
+```
+```{r}
+AQI_data |> ggplot(aes(x=DateTime, y=sensor_4_average)) +
+  geom_line() +
+  geom_point()
+```
+

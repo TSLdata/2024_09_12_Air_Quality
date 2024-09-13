@@ -9,3 +9,43 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Load packages
+```{r}
+library(tidyverse)
+```
+
+Read in data
+```{r}
+full_AQI_data <- read_csv("us-epa-pm25-aqi-jacobs4-jacobs-5.csv")
+head(full_AQI_data)
+```
+
+
+```{r}
+filtered_full_AQI <- full_AQI_data |> select(DateTime,`HMC Jacobs 5 A`, `HMC Jacobs 5 B`, `HMC Jacobs 4 A`, `HMC Jacobs 4 B` )
+```
+
+```{r}
+startDate = as.POSIXlt("2024-09-05 4:10:00")
+recent_AQI_data <- filtered_full_AQI |>
+  filter(DateTime > startDate)
+```
+
+```{r}
+recent_AQI_data
+```
+```{r}
+recent_AQI_data <- recent_AQI_data |>
+  mutate(sensor_5_average = ((`HMC Jacobs 5 A` + `HMC Jacobs 5 B`)/2)) 
+
+recent_AQI_data_final <- recent_AQI_data |>
+  mutate(sensor_4_average = ((`HMC Jacobs 4 A` + `HMC Jacobs 4 B`)/2)) 
+
+head(recent_AQI_data_final)
+```
+
+```{r}
+write_csv(recent_AQI_data_final, "us-epa-pm25-aqi-jacobs4-jacobs5-clean.csv")
+```
+
+
