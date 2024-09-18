@@ -22,9 +22,10 @@ AQI_data <- read_csv("us-epa-pm25-aqi-jacobs4-jacobs5-clean.csv")
 ```{r}
 first = as.POSIXct("2024-09-05 00:00:10")
 last = as.POSIXct("2024-09-12 24:00:00")
+bad <- annotate("rect", fill="red",ymin=150, ymax=200, 
+                               alpha = 0.3, xmin= first, xmax= last) 
 p <- AQI_data |> ggplot(aes(x=DateTime, y=sensor_4_average)) + 
-  annotate("rect", fill="red",ymin=150, ymax=200, 
-                               alpha = 0.3, xmin= first, xmax= last, label = "unhealthy") + 
+  bad + 
   annotate("rect", fill="orange",ymin=100, ymax=150, 
                                alpha = 0.3, xmin= first, xmax= last) +
   annotate("rect", fill="purple",ymin=200, ymax=250, 
@@ -43,6 +44,7 @@ p
 
 ```{r}
 ggplotly(p)
+
 ```
 
 ```{r}
@@ -84,4 +86,9 @@ p2 <- all|> ggplot() +
 p2
 ```
 
+```{r}
+fig <- plot_ly(all, x=Date, y=Jacobs5A, type = 'scatter')
+
+fig
+```
 
