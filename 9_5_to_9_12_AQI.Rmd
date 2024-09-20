@@ -45,6 +45,19 @@ head(recent_AQI_data_final)
 ```
 
 ```{r}
+J4A_max = max(recent_AQI_data_final$`HMC Jacobs 4 A`)
+J4B_max = max(recent_AQI_data_final$`HMC Jacobs 4 B`)
+
+J4A_max
+J4B_max
+
+date_4A_max <- recent_AQI_data_final %>%
+  filter(`HMC Jacobs 4 A` == J4A_max)
+
+date_4A_max
+```
+
+```{r}
 dates <- recent_AQI_data_final %>% select(DateTime)
 dates
 write_csv(recent_AQI_data_final, "us-epa-pm25-aqi-jacobs4-jacobs5-clean.csv")

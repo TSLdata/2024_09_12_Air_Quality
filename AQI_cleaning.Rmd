@@ -1,0 +1,55 @@
+---
+title: "AQI_cleaning"
+author: "Brecken Enright"
+date: "2024-09-19"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load packages
+```{r}
+library(tidyverse)
+```
+
+Read in data
+```{r}
+full_AQI_data <- read_csv("us-epa-pm25-aqi-updated.csv")
+head(full_AQI_data)
+```
+
+
+```{r}
+filtered_full_AQI <- full_AQI_data |> select(DateTime, `HMC Jacobs 4 A`, 
+                                             `HMC Jacobs 4 B` )
+head(filtered_full_AQI)
+```
+
+
+```{r}
+startDate = as.POSIXct("2024-09-05 00:10:00")
+endDate = as.POSIXct("2024-09-15 00:10:00")
+
+recent_AQI_data <- filtered_full_AQI |>
+  filter(DateTime > startDate)
+
+recent_AQI_data_2 <- recent_AQI_data |>
+  filter(DateTime < endDate)
+
+head(recent_AQI_data_2)
+
+```
+
+
+```{r}
+recent_AQI_data_final <- recent_AQI_data_2 |>
+  mutate(sensor_4_average = ((`HMC Jacobs 4 A` + `HMC Jacobs 4 B`)/2)) 
+
+head(recent_AQI_data_final)
+```
+```{r}
+write_csv(recent_AQI_data_final, "us-epa-pm25-aqi-jacobs4-recent-clean.csv")
+```
+
