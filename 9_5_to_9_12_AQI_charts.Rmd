@@ -26,7 +26,7 @@ bridge_fire_start = as.POSIXct("2024-09-08 14:10:00")
 first = as.POSIXct("2024-09-05 00:00:10")
 last = as.POSIXct("2024-09-15 00:10:00")
 
-p <- AQI_data |> ggplot(aes(x=DateTime, y=sensor_4_average)) + 
+p <- AQI_data |> ggplot(aes(x=date, y=avg_PM2.5_AQI)) + 
   annotate("rect", fill="#C2B4E2",ymin=200, ymax=250, 
                                alpha = .75, xmin= first, xmax= last) + 
   annotate("rect", fill="#FF9A98",ymin=150, ymax=200, 
@@ -40,7 +40,7 @@ p <- AQI_data |> ggplot(aes(x=DateTime, y=sensor_4_average)) +
                    breaks = date_breaks("1 day")) +
   geom_vline(xintercept = line_fire_start, linetype = "dotted") +
   geom_vline(xintercept = bridge_fire_start, linetype = "dotted") + 
-  ylab("PM2.5 Air Quality Index") + 
+  ylab("PM 2.5 Air Quality Index") + 
   theme_minimal() +
   theme(text = element_text(family = "palatino"),
         axis.title.x=element_blank())
@@ -60,102 +60,5 @@ interactiveP
 
 ```
 
-```{r}
-Date <- AQI_data$DateTime
-Jacobs5A <- AQI_data$`HMC Jacobs 5 A`
-wColors <- data_frame(Date, Jacobs5A)
 
-good <- wColors |>
-  filter(Jacobs5A < 51) |>
-  mutate(quality = "good")
 
-moderate <- wColors |>
-  filter((Jacobs5A < 101) & (Jacobs5A >51)) |>
-  mutate(quality = "moderate")
-
-unhealthy_for_sen <- wColors |>
-  filter((Jacobs5A < 151) & (Jacobs5A > 101)) |>
-  mutate(quality = "Unhealthy for Sensitive Groups")
-
-unhealthy <- wColors |>
-  filter((Jacobs5A < 201) & (Jacobs5A > 151)) |>
-  mutate(quality = "Unhealthy")
-
-very_unhealthy <- wColors |>
-  filter((Jacobs5A < 251) & (Jacobs5A > 201)) |>
-  mutate(quality = "Very unhealthy")
-
-all <- rbind(good, moderate)
-all <- rbind(all, unhealthy_for_sen)
-all <- rbind(all, unhealthy)
-all <- rbind(all, very_unhealthy)
-
-```
-
-```{r}
-p2 <- all|> ggplot() + 
-  geom_line(aes(x=Date, y=Jacobs5A)) +
-  geom_point(aes(x=Date, y=Jacobs5A, color = quality)) 
-
-p2
-```
-
-```{r}
-first = as.POSIXct("2024-09-05 00:00:10")
-last = as.POSIXct("2024-09-12 24:00:00")
-
-fig <- plot_ly(all, x=Date, y=Jacobs5A, type = 'scatter')
-
-fig <- layout(fig, shapes = list(
-               list(type = "rect",fillcolor = "green", label = "good",
-                    line = list(color = "green"), opacity = 0.3,
-                    x0 = first, x1 = last, xref = "x",
-                    y0 = 0, y1 = 100, yref = "y"),
-               list(type = "rect",
-                 fillcolor = "orange", line = list(color = "orange"), 
-                 opacity = 0.3,
-                 x0 = first, x1 = last, xref = "x",
-                 y0 = 101, y1 = 150, yref = "y")))
-fig
-```
-
-```{r}
-first = as.POSIXct("2024-09-05 00:00:10")
-last = as.POSIXct("2024-09-12 24:00:00")
-
-bad <- annotate("rect", fill="red",ymin=150, ymax=200, 
-                               alpha = 0.3, xmin= first, xmax= last) 
-ggplot_obj <- AQI_data |> ggplot(aes(x=DateTime, y=sensor_4_average)) + 
-  geom_point() +
-  geom_line() +
-  scale_x_datetime(labels = date_format('%m-%d'), breaks = date_breaks("1 day")) +
-  ylab("PM2.5 AQI") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
-
-ggplot_obj
-```
-
-```{r}
-first = as.POSIXct("2024-09-05 00:00:10")
-last = as.POSIXct("2024-09-12 24:00:00")
-
-plotly_obj <- ggplotly(ggplot_obj)
-
-my_rectangle <- list(
-    type = "rect",
-    fillcolor = "green",
-    line = list(color = "black"),
-    opacity = 0.3,
-    x0 = first,
-    x1 = last,
-    xref = "x",
-    y0 = 0,
-    y1 = 100,
-    yref = "y"
-)
-
-plotly_obj2 <- add_polygons(plotly_obj, type = "rect")
-
-plotly_obj2
-
-```

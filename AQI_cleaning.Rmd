@@ -38,14 +38,37 @@ recent_AQI_data <- filtered_full_AQI |>
 recent_AQI_data_2 <- recent_AQI_data |>
   filter(DateTime < endDate)
 
+
 head(recent_AQI_data_2)
 
 ```
 
-
+Add average of both sensor chanels
 ```{r}
 recent_AQI_data_final <- recent_AQI_data_2 |>
   mutate(sensor_4_average = ((`HMC Jacobs 4 A` + `HMC Jacobs 4 B`)/2)) 
+```
+
+Find Worst AQI During Period analyzed
+```{r}
+J4A_max = max(recent_AQI_data_final$`HMC Jacobs 4 A`)
+J4B_max = max(recent_AQI_data_final$`HMC Jacobs 4 B`)
+
+J4A_max
+J4B_max
+
+date_4A_max <- recent_AQI_data_final %>%
+  filter(`HMC Jacobs 4 A` == J4A_max)
+
+date_4A_max
+```
+
+```{r}
+recent_AQI_data_final <- recent_AQI_data_final %>% rename(
+  date = DateTime,
+  PA_sensor_176379A = `HMC Jacobs 4 A`,
+  PA_sensor_176379B = `HMC Jacobs 4 B`,
+  avg_PM2.5_AQI = sensor_4_average)
 
 head(recent_AQI_data_final)
 ```

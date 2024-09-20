@@ -1,4 +1,4 @@
-DateTime,HMC Jacobs 4 A,HMC Jacobs 4 B,sensor_4_average
+date,PA_sensor_176379A,PA_sensor_176379B,avg_PM2.5_AQI
 2024-09-05T07:20:00Z,45,43,44
 2024-09-05T07:30:00Z,50,50,50
 2024-09-05T07:40:00Z,57,62,59.5
